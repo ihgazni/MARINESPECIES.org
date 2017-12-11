@@ -197,6 +197,7 @@ def crawl_continue(unhandled,next_unhandled,unhandled_start,children_start,info_
         for i in range(unhandled_start,unhandled.__len__()):
             ele = unhandled[i]
             print(ele)
+            sys.stdout.flush()
             parent_path = ele['path']
             ID = ele['ID']
             leaf = 0
@@ -206,20 +207,24 @@ def crawl_continue(unhandled,next_unhandled,unhandled_start,children_start,info_
                     info_container,records_container,children = AphiaChildrenByAphiaID(info_container,records_container,ID,marine_only=True)
                     if((children == [])&(info_container['resp'].getcode() == 204)):
                         print('Leaf: ' + info_container['url'])
+                        sys.stdout.flush()
                         leaf = 1
                         cond = 0
                 #except AttributeError as Error:
                 except:
                     if(info_container['resp_head'] == []):
                         print('No resp: ' + info_container['url'])
+                        sys.stdout.flush()
                         cond = 1
                         info_container,records_container = marinespecies_init()
                     else:
                         print('Fail: ' + info_container['url'])
+                        sys.stdout.flush()
                         cond = 1
                         time.sleep(60)
                 else:
                     print('Success: ' + info_container['url'])
+                    sys.stdout.flush()
                     cond = 0
             for j in range(children_start,children.__len__()):
                 child = children[j]
@@ -231,6 +236,7 @@ def crawl_continue(unhandled,next_unhandled,unhandled_start,children_start,info_
                     if(child['status']=="unaccepted"):
                         #handle,exzample "404961"
                         print('Unaccepted: ' + info_container['url'])
+                        sys.stdout.flush()
                     else:
                         pass
                     ####################                    
@@ -262,9 +268,10 @@ def crawl_continue(unhandled,next_unhandled,unhandled_start,children_start,info_
             nvft.write_to_file(fn=fn,content=json.dumps(unhandled),op='w')
             fn = '../CONTINUE/seq.record'
             nvft.write_to_file(fn=fn,content=json.dumps({"unhandled":i}),op='w')
-            fn = '../CONTINUE/leaf.record'
             if(leaf == 1):
-                nvft.write_to_file(fn=fn,content=os.path.basename(parent_path)+'\n',op='a+')
+                fn = '../CONTINUE/leaf.record'
+                nvft.write_to_file(fn=fn,content=os.path.basename(parent_path) + '    :    ' + parent_path + '\n',op='a+')
+                nvft.write_to_file(fn=fn,content=parent_path + '    :    ' + os.path.basename(parent_path) + '\n',op='a+')                
             else:
                 pass
             ########
